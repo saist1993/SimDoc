@@ -45,7 +45,7 @@ reads = []
 for row in reader:
 	reads.append(row)
 
-f = open('similarity_matrix.dat')
+f = open('similarity.dat')
 d = pickle.load(f)
 f.close()
 fo = open("results.txt","w")
@@ -85,7 +85,7 @@ file_rid = open("foo.txt", "wb") #to open file in append mode use a+
 max_retry = 3
 nlp_url = "http://0.0.0.0:10001/hello" #http:
 elasticsearch_url = "http://104.199.168.125:9200"
-tp_url = "http://131.220.9.176:10007/integrated"
+tp_url = "http://0.0.0.0:9989/integrated"
 s = requests.Session() #session objects to send requests.
 startJVM(getDefaultJVMPath(), "-ea")
 
