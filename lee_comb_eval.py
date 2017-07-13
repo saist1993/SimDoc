@@ -1,4 +1,8 @@
 
+''' 
+	The program aims to evaluate SimDoc on the lee_comb dataset. 
+
+'''
 # -*- coding: utf-8 -*-
 import pyorient
 import os
@@ -7,6 +11,8 @@ import csv
 import ujson
 import requests
 import traceback
+
+#interacing the code with java.
 
 import JPype_SimDoc
 
@@ -33,7 +39,9 @@ import string
 import smithwaterman_v3
 
 fname = "evaluation_dataset/LeePincombeWelsh/LeePincombeWelshDocuments.txt"
-fcsv = "evaluation_dataset/LeePincombeWelsh/LeePincombeWelshData.csv" 
+fcsv = "evaluation_dataset/LeePincombeWelsh/LeePincombeWelshData.csv"
+
+
 with open(fname) as f:
 	content = f.readlines()
 
@@ -45,9 +53,12 @@ reads = []
 for row in reader:
 	reads.append(row)
 
+#similarity.dat file has topic-to-topic similarity.
 f = open('similarity.dat')
 d = pickle.load(f)
 f.close()
+
+
 fo = open("results.txt","w")
 fo.close()
 word2vec_matrix = []
@@ -61,31 +72,36 @@ sys.setdefaultencoding('utf-8')
 
 # print " ".join(str(x[1]) for x in line)
 
-
+#Legacy code macros.
 limit = 10000			#Number of test cases to consider
 delimiter = "a"	#delimiter for ending sentence
 
-# connecting to database
-client = pyorient.OrientDB("localhost", 2424)
-db = client.db_open( "arxiv", "root", "rygbee")
+
+# connecting to database. The database seems to be working.
+# client = pyorient.OrientDB("localhost", 2424)
+# db = client.db_open( "arxiv", "root", "rygbee")
 
 
 
 
 # read from file and store files in an array list.
 
-file = open("arxiv_2014_09_27_examples.txt")
-temp_array = file.read().split("\n")
-file_array = []
-for line in temp_array:
-	temp = line.split(" ")
-	file_array.append(temp)
+# file = open("arxiv_2014_09_27_examples.txt")
+# temp_array = file.read().split("\n")
+# file_array = []
+# for line in temp_array:
+# 	temp = line.split(" ")
+# 	file_array.append(temp)
 
-file_rid = open("foo.txt", "wb") #to open file in append mode use a+
-max_retry = 3
-nlp_url = "http://0.0.0.0:10001/hello" #http:
+# file_rid = open("foo.txt", "wb") #to open file in append mode use a+
+# max_retry = 3
+
+
+
+
+nlp_url = "http://0.0.0.0:10001/hello" # server_nlp.py in NLP folder.
 elasticsearch_url = "http://104.199.168.125:9200"
-tp_url = "http://0.0.0.0:9989/integrated"
+tp_url = "http://0.0.0.0:9989/integrated" # topic_modeller_ssimplified. 
 s = requests.Session() #session objects to send requests.
 startJVM(getDefaultJVMPath(), "-ea")
 
@@ -288,6 +304,7 @@ def updatedway_createsequence(json_document):
 	subject_sequence = []
 	object_sequence = []
 	relation_sequence = []
+	pprint(json_document)
 	# print "temp objectc is "
 	for sen in json_document['document_sentences']:
 		subject_sequence = []
@@ -359,8 +376,10 @@ def post_search(document):
 	odb_rid = 0
 	json_document = construct_json_object(rid = "",raw_text=document,form_question="",form_answer="",form_elaboration="",tags="",tags_array=[],name="")
 	json_document_nlp = construct_json_object_server(json_document,"alpha")
+	# pprint(json_document_nlp)
 	try:
 		json_document_nlp = ujson.dumps(json_document_nlp)
+		# print "done with creating a json of the file to nlp server"
 	except:
 		print traceback.format_exc()
 	# print "sending request to nlp"
@@ -369,8 +388,10 @@ def post_search(document):
 	if response_nlp == -1:
 		print "error at nlp"
 	#now changin the source back to alpha
+	# pprint(response_nlp)
 	response_nlp["source"] = "alpha"
 	response_nlp["data"]["nlp"] = True
+	# print "********8done********"
 	#sending this response to topicmodeller
 	# print "trying to gain some information of nlp response"
 	try:
@@ -439,6 +460,8 @@ for row in reads[1:]:
 	print row
 	doc1 =  content[int(row[1])-1]	
 	doc2 =  content[int(row[2])-1]
+	print doc1
+	print doc2
 	if doc1 and doc2: 
 		document_A = post_search(doc1)
 		document_B = post_search(doc2)

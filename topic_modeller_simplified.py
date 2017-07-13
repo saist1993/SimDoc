@@ -15,6 +15,11 @@ from gensim import models, corpora
 from multiprocessing import Process, Pipe
 from operator import itemgetter
 
+
+
+
+# tp = topic_modeller.TopicModeller(_compiled_path, _document_stream, _cleaner)
+
 ''' The file should take model and dictionary. And then create a server and inverse hash map.'''
 
 '''topic modeller boiler plate code '''
@@ -34,6 +39,9 @@ dictionary = corpora.Dictionary.load(dname)
 model = models.LdaModel.load(mname)
 
 print "done loading model and dictionary"
+
+#creating object for cleaner
+cleaner = cleaner.Cleaner()
 
 def create_inverse_hashmap(number_of_topics):
 	#Generate the inverse topic hashmap
@@ -59,8 +67,8 @@ def create_inverse_hashmap(number_of_topics):
 def update_vocabulary(_string, _runtime = False):
 		'''To update the dictionary with the string. It is cleaned and broken down into a list of words
 		and then given to the dictionary to be stored. Also, every 500 documents prompts the dictionary to save itself.'''
-
-		unsaved_docs += 1
+		global unsaved_docs
+		unsaved_docs = unsaved_docs + 1
 		if unsaved_docs > 500:
 			#if self.verbose:
 			#	print "database:update_vocabulary: We've seen too many documents now. Time to save the dictionary to the disk."
@@ -138,6 +146,7 @@ def jsongateway():
 
     try:
         parsed_json = ujson.loads(request_body)
+        print "parsed_json formed"
 
     except:
         print "server/hello/POST: Cannot parse JSON from the request. Is it a valid JSON request?"
@@ -157,14 +166,15 @@ def jsongateway():
        sentences.append(x["processed_text"])
        subjects.append([x["processed_text"][int(index)] for index in x["subject"]])
        objects.append([x["processed_text"][int(index)] for index in x["object"]])
-       objects.append([x["processed_text"][int(index)] for index in x["object"]])
+       # objects.append([x["processed_text"][int(index)] for index in x["object"]])
        relations.append([x["processed_text"][int(index)] for index in x["relation"]])
     #Use this to generate topics for the entire document.
     print sentences
     document_text = ' '.join(x for x in sentences_text)
     after_for_loop_time = time.time()   
     #To generate topics for sentences/words, we need more magic.
-    document_topic_model, document_topic_sequence, [subject_topics, object_topics, relation_topics,sentences_topics] = topic_modeller.find_document_topics(document_text,subjects,objects,relations,sentences)
+    print "about to generate topic for the document"
+    document_topic_model, document_topic_sequence, [subject_topics, object_topics, relation_topics,sentences_topics] = find_document_topics(document_text,subjects,objects,relations,sentences)
     after_document_sequence = time.time()   
     print sentences_topics
 

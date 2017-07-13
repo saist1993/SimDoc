@@ -247,11 +247,11 @@ def nlp_integrated():
 
 #======================================================================================================
 if __name__ == "__main__":
-    nlp = NLPInitializer(_short_text_length = 50000)
+    nlp = NLPInitializer(_short_text_length = 5000)
 
         #Check the server address (the micro-server is stand-alone and has to be triggered manually)
     #======================================================================================================#
     # run(host='localhost', port=10001, debug=True,server='gunicorn', workers=4)
-    run(host='0.0.0.0', port=10001, debug=False,server = 'eventlet',workers = 4)
+    run(host='0.0.0.0', port=10001, debug=False,server = 'eventlet',workers = 1)
     # ip = 'http://127.0.0.1:10001/hello'
     # run(host='127.0.0.1', port=10001, debug=False,server = 'gunicorn',workers = 1)

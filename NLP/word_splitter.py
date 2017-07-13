@@ -46,7 +46,7 @@ class Splitter:
 
 		
 
-		word_file = open(os.path.join('../data/	dictionary.txt'),'r')
+		word_file = open(os.path.join('data/dictionary.txt'),'r')
 		word_text = word_file.read()
 		word_file.close()
 
